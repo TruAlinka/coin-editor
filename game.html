@@ -1,224 +1,208 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>English Game Widget</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            width: 100vw;
-            height: 100vh;
-            background: transparent;
-            font-family: Arial, sans-serif;
-            overflow: hidden;
-        }
-
-        #gameContainer {
-            width: 100%;
-            height: 100%;
-            position: relative;
-            background: transparent;
-        }
-
-        .element {
-            width: 80px;
-            height: 80px;
-            position: absolute;
-            cursor: pointer;
-            animation: fall linear forwards;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center;
-        }
-
-        .element:hover {
-            transform: scale(1.1);
-            filter: brightness(1.2);
-        }
-
-        @keyframes fall {
-            to {
-                transform: translateY(100vh);
-            }
-        }
-
-        #modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
-
-        #modal.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            max-width: 500px;
-            width: 90%;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-        }
-
-        .question {
-            font-size: 20px;
-            margin-bottom: 20px;
-            font-weight: bold;
-            color: #333;
-        }
-
-        .options {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .option {
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-            background: white;
-            font-size: 16px;
-        }
-
-        .option:hover {
-            border-color: #4CAF50;
-            background: #f0f8f0;
-        }
-
-        .option.correct {
-            background: #4CAF50;
-            color: white;
-            border-color: #4CAF50;
-        }
-
-        .option.incorrect {
-            background: #f44336;
-            color: white;
-            border-color: #f44336;
-        }
-
-        #score {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            font-size: 24px;
-            font-weight: bold;
-            color: #FFD700;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-            z-index: 100;
-            background: rgba(0, 0, 0, 0.3);
-            padding: 10px 20px;
-            border-radius: 10px;
-        }
-
-        .feedback {
-            margin-top: 15px;
-            padding: 10px;
-            border-radius: 5px;
-            text-align: center;
-            font-weight: bold;
-            display: none;
-        }
-
-        .feedback.show {
-            display: block;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Игровой виджет</title>
+  <style>
+    body, html {
+      margin: 0; padding: 0; overflow: hidden;
+      width: 100vw; height: 100vh;
+      background: transparent;
+      font-family: Arial, sans-serif;
+      position: relative;
+    }
+    #gameContainer {
+      width: 100%; height: 100%;
+      position: relative;
+      background: transparent;
+      overflow: hidden;
+    }
+    .element {
+      width: 80px;
+      height: 80px;
+      position: absolute;
+      cursor: pointer;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      animation-name: falling;
+      animation-timing-function: linear;
+      animation-fill-mode: forwards;
+    }
+    @keyframes falling {
+      from { transform: translateY(-100px); }
+      to { transform: translateY(100vh); }
+    }
+    #modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    #modal.active {
+      display: flex;
+    }
+    .modal-content {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 400px;
+      width: 90%;
+    }
+    .question {
+      font-weight: bold;
+      margin-bottom: 15px;
+    }
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .option {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .option:hover {
+      background: #eef;
+    }
+    .option.correct {
+      background: #4caf50;
+      color: white;
+      border-color: #4caf50;
+    }
+    .option.incorrect {
+      background: #f44336;
+      color: white;
+      border-color: #f44336;
+    }
+    #score {
+      position: fixed;
+      top: 10px; right: 10px;
+      background: rgba(0,0,0,0.4);
+      color: gold;
+      font-weight: bold;
+      font-size: 20px;
+      padding: 8px 12px;
+      border-radius: 10px;
+      z-index: 1000;
+      user-select: none;
+    }
+  </style>
 </head>
 <body>
-    <div id="gameContainer"></div>
-    <div id="score">💰 0</div>
+  <div id="gameContainer"></div>
+  <div id="score">💰 0</div>
 
-    <div id="modal">
-        <div class="modal-content">
-            <div class="question" id="questionText"></div>
-            <div class="options" id="optionsContainer"></div>
-            <div class="feedback" id="feedback"></div>
-        </div>
+  <div id="modal">
+    <div class="modal-content">
+      <div class="question" id="questionText"></div>
+      <div class="options" id="optionsContainer"></div>
     </div>
+  </div>
 
-    <script>
-        let questions = [];
-        let elementUrl = '';
-        let score = 0;
-        let currentQuestion = null;
-        let answered = false;
+<script>
+  // Читаем параметры из URL
+  const urlParams = new URLSearchParams(window.location.search);
+  let questions = [];
+  let elementUrl = '';
+  try {
+    const q = urlParams.get('questions');
+    if (q) questions = JSON.parse(decodeURIComponent(q));
+  } catch(e) {
+    console.error('Ошибка разбора вопросов:', e);
+  }
+  elementUrl = urlParams.get('element') || '';
 
-        // Парсим параметры из URL
-        function getParams() {
-            const params = new URLSearchParams(window.location.search);
-            const questionsParam = params.get('questions');
-            elementUrl = params.get('element');
+  const gameContainer = document.getElementById('gameContainer');
+  const modal = document.getElementById('modal');
+  const questionText = document.getElementById('questionText');
+  const optionsContainer = document.getElementById('optionsContainer');
+  const scoreEl = document.getElementById('score');
 
-            if (questionsParam) {
-                questions = JSON.parse(decodeURIComponent(questionsParam));
-            }
-        }
+  let score = 0;
+  let currentQuestion = null;
+  let answered = false;
 
-        function playSound(type) {
-            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-            
-            oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            
-            if (type === 'click') {
-                oscillator.frequency.value = 800;
-                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
-                oscillator.start(audioContext.currentTime);
-                oscillator.stop(audioContext.currentTime + 0.1);
-            } else if (type === 'correct') {
-                oscillator.frequency.setValueAtTime(523, audioContext.currentTime);
-                oscillator.frequency.setValueAtTime(659, audioContext.currentTime + 0.1);
-                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
-                oscillator.start(audioContext.currentTime);
-                oscillator.stop(audioContext.currentTime + 0.3);
-            }
-        }
+  // Создаем падающий элемент
+  function createElement() {
+    if (!elementUrl || questions.length === 0) return;
 
-        function getRandomQuestion() {
-            return questions[Math.floor(Math.random() * questions.length)];
-        }
+    const el = document.createElement('div');
+    el.className = 'element';
+    el.style.backgroundImage = `url('${elementUrl}')`;
 
-        function createElement() {
-            const element = document.createElement('div');
-            element.className = 'element';
-            element.style.backgroundImage = `url('${elementUrl}')`;
-            
-            const x = Math.random() * (window.innerWidth - 80);
-            const duration = 6 + Math.random() * 3;
-            
-            element.style.left = x + 'px';
-            element.style.top = '-100px';
-            element.style.animationDuration = duration + 's';
-            
-            element.addEventListener('click', (e) => {
-                e.stopPropagation();
-                playSound('click');
-                currentQuestion = getRandomQuestion();
-                showModal();
-                element.remove();
-       
+    const left = Math.random() * (window.innerWidth - 80);
+    el.style.left = left + 'px';
+
+    const duration = 7000 + Math.random() * 3000;
+    el.style.animationDuration = duration + 'ms';
+
+    el.addEventListener('click', e => {
+      e.stopPropagation();
+      if (modal.classList.contains('active')) return; // Чтобы не открывать несколько заданий одновременно
+      currentQuestion = questions[Math.floor(Math.random() * questions.length)];
+      showModal(currentQuestion);
+      el.remove();
+    });
+
+    gameContainer.appendChild(el);
+
+    // Удалить элемент после завершения анимации
+    setTimeout(() => {
+      if (el.parentNode) el.remove();
+    }, duration);
+  }
+
+  // Показываем окно с вопросом
+  function showModal(question) {
+    answered = false;
+    questionText.textContent = question.question;
+    optionsContainer.innerHTML = '';
+    modal.classList.add('active');
+
+    question.options.forEach((option, idx) => {
+      const btn = document.createElement('div');
+      btn.className = 'option';
+      btn.textContent = option;
+      btn.onclick = () => checkAnswer(idx, btn, question.correct);
+      optionsContainer.appendChild(btn);
+    });
+  }
+
+  // Проверяем ответ
+  function checkAnswer(selected, btn, correct) {
+    if (answered) return;
+    answered = true;
+
+    if (selected === correct) {
+      btn.classList.add('correct');
+      score++;
+      scoreEl.textContent = `💰 ${score}`;
+    } else {
+      btn.classList.add('incorrect');
+      // Показываем правильный
+      const children = optionsContainer.children;
+      if (children[correct]) children[correct].classList.add('correct');
+    }
+
+    // Закрыть модал через 2 секунды
+    setTimeout(() => {
+      modal.classList.remove('active');
+    }, 2000);
+  }
+
+  // Создавать падающие элементы периодически
+  setInterval(createElement, 3000);
+  createElement();
+</script>
+</body>
+</html>
