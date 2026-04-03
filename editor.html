@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Editor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .panel {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        h2 {
+            font-size: 18px;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            color: #555;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 5px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        input[type="text"],
+        input[type="url"],
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        button {
+            background: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #45a049;
+        }
+
+        button.secondary {
+            background: #2196F3;
+        }
+
+        button.secondary:hover {
+            background: #0b7dda;
+        }
+
+        button.danger {
+            background: #f44336;
+        }
+
+        button.danger:hover {
+            background: #da190b;
+        }
+
+        .question-item {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            border-left: 4px solid #4CAF50;
+        }
+
+        .question-item h3 {
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .question-item p {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .question-item .options {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 10px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 5px;
+        }
+
+        .btn-group button {
+            flex: 1;
+            padding: 8px;
+            font-size: 12px;
+        }
+
+        #preview {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 5px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-size: 12px;
+            font-family: monospace;
+            word-break: break-all;
+        }
+
+        .img-preview {
+            width: 100px;
+            height: 100px;
+            border-radius: 5px;
+            margin-top: 10px;
+            object-fit: cover;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="panel">
+            <h1>🎮 Game Editor</h1>
+
+            <h2>Настройки игры</h2>
+            <div class="form-group">
+                <label>URL падающего элемента (гифка/изображение)</label>
+                <input type="url" id="elementUrl" placeholder="https://example.com/coin.gif">
+                <img id="elementPreview" class="img-preview" style="display:none;">
+            </div>
+
+            <h2>Добавить вопрос</h2>
+            <div class="form-group">
+                <label>Вопрос</label>
+                <textarea id="questionText" placeholder="Введите вопрос"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Вариант ответа 1</label>
+                <input type="text" id="option1" placeholder="Ответ 1">
+            </div>
+
+            <div class="form-group">
+                <label>Вариант ответа 2</label>
+                <input type="text" id="option2" placeholder="Ответ 2">
+            </div>
+
+            <div class="form-group">
+                <label>Вариант ответа 3</label>
+                <input type="text" id="option3" placeholder="Ответ 3">
+            </div>
+
+            <div class="form-group">
+                <label>Вариант ответа 4</label>
+                <input type="text" id="option4" placeholder="Ответ 4">
+            </div>
+
+            <div class="form-group">
+                <label>Номер правильного ответа (1-4)</label>
+                <input type="text" id="correctAnswer" placeholder="1" style="width: 50px;">
+            </div>
+
+            <button onclick="addQuestion()">+ Добавить вопрос</button>
+        </div>
+
+        <div class="panel">
+            <h2>Вопросы в игре</h2>
+            <div id="questionsList"></div>
+
+            <h2>Код для встраивания</h2>
+            <button class="secondary" onclick="generateCode()">Сгенерировать код</button>
+            <div id="preview"></div>
+            <button class="secondary" onclick="copyCode()" style="margin-top: 10px; width: 100%;">📋 Копировать код</button>
+        </div>
+    </div>
+
+    <script>
+        let questions = [];
+
+        function addQuestion() {
+            const text = document.getElementById('questionText').value.trim();
+            const opts = [
+                document.getElementById('option1').value.trim(),
+                document.getElementById('option2').value.trim(),
+                document.getElementById('option3').value.trim(),
+                document.getElementById('option4').value.trim()
+            ];
+            const correct = parseInt(document.getElementById('correctAnswer').value) - 1;
+
+            if (!text || opts.some(o => !o) || correct < 0 || correct > 3) {
+                alert('Заполните все поля и выберите правильный ответ (1-4)');
+                return;
+            }
+
+            questions.push({ question: text, options: opts, correct });
+            
+            document.getElementById('questionText').value = '';
+            document.getElementById('option1').value = '';
+            document.getElementById('option2').value = '';
+            document.getElementById('option3').value = '';
+            document.getElementById('option4').value = '';
+            document.getElementById('correctAnswer').value = '';
+
+            renderQuestions();
+        }
+
+        function renderQuestions() {
+            const list = document.getElementById('questionsList');
+            list.innerHTML = questions.map((q, i) => `
+                <div class="question-item">
+                    <h3>Вопрос ${i + 1}: ${q.question}</h3>
+                    <div class="options">
+                        ${q.options.map((o, j) => `<p>${j + 1}. ${o} ${j === q.correct ? '✓' : ''}</p>`).join('')}
+                    </div>
+                    <div class="btn-group">
+                        <button class="danger" onclick="deleteQuestion(${i})">Удалить</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function deleteQuestion(index) {
+            questions.splice(index, 1);
+            renderQuestions();
+        }
+
+        function generateCode() {
+            const elementUrl = document.getElementById('elementUrl').value.trim();
+            
+            if (!elementUrl) {
+                alert('Укажите URL элемента');
+                return;
+            }
+
+            if (questions.length === 0) {
+                alert('Добавьте хотя бы один вопрос');
+                return;
+            }
+
+            const questionsJson = JSON.stringify(questions);
+            const code = `<iframe src="https://YOUR_USERNAME.github.io/game.html?questions=${encodeURIComponent(questionsJson)}&element=${encodeURIComponent(elementUrl)}" width="100%" height="600" frameborder="0" style="border: none; border-radius: 10px;"></iframe>`;
+            
+            document.getElementById('preview').textContent = code;
+        }
+
+        function copyCode() {
+            const code = document.getElementById('preview').textContent;
+            if (!code) {
+                alert('Сначала сгенерируйте код');
+                return;
+            }
+            navigator.clipboard.writeText(code);
+            alert('Код скопирован!');
+        }
+
+        document.getElementById('elementUrl').addEventListener('change', function() {
+            const preview = document.getElementById('elementPreview');
+            if (this.value) {
+                preview.src = this.value;
+                preview.style.display = 'block';
+            } else {
+                preview.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
