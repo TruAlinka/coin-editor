@@ -29,35 +29,45 @@
       animation-name: falling;
       animation-timing-function: linear;
       animation-fill-mode: forwards;
+      user-select: none;
+      -webkit-user-select: none;
     }
     @keyframes falling {
       from { transform: translateY(-100px); }
       to { transform: translateY(100vh); }
     }
+
+    /* Модальное окно */
     #modal {
       display: none;
       position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.7);
-      display: flex;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
       align-items: center;
       justify-content: center;
       z-index: 1000;
+      pointer-events: none; /* Блокируем клики когда закрыто */
     }
+
     #modal.active {
       display: flex;
+      pointer-events: auto; /* Разрешаем клики когда открыто */
     }
+
     .modal-content {
       background: white;
       padding: 20px;
       border-radius: 10px;
       max-width: 400px;
       width: 90%;
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-user-select: none;
     }
     .question {
       font-weight: bold;
       margin-bottom: 15px;
+      color: #222;
     }
     .options {
       display: flex;
@@ -70,6 +80,8 @@
       border-radius: 6px;
       cursor: pointer;
       transition: background 0.3s;
+      user-select: none;
+      -webkit-user-select: none;
     }
     .option:hover {
       background: #eef;
@@ -95,6 +107,7 @@
       border-radius: 10px;
       z-index: 1000;
       user-select: none;
+      -webkit-user-select: none;
     }
   </style>
 </head>
@@ -103,14 +116,14 @@
   <div id="score">💰 0</div>
 
   <div id="modal">
-    <div class="modal-content">
+    <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="questionText">
       <div class="question" id="questionText"></div>
       <div class="options" id="optionsContainer"></div>
     </div>
   </div>
 
 <script>
-  // Читаем параметры из URL
+  // Парсим параметры questions и element из URL
   const urlParams = new URLSearchParams(window.location.search);
   let questions = [];
   let elementUrl = '';
@@ -148,7 +161,7 @@
 
     el.addEventListener('click', e => {
       e.stopPropagation();
-      if (modal.classList.contains('active')) return; // Чтобы не открывать несколько заданий одновременно
+      if (modal.classList.contains('active')) return;
       currentQuestion = questions[Math.floor(Math.random() * questions.length)];
       showModal(currentQuestion);
       el.remove();
@@ -156,13 +169,13 @@
 
     gameContainer.appendChild(el);
 
-    // Удалить элемент после завершения анимации
+    // Удалить элемент после анимации, если не кликнули
     setTimeout(() => {
       if (el.parentNode) el.remove();
     }, duration);
   }
 
-  // Показываем окно с вопросом
+  // Показ модального окна с вопросом
   function showModal(question) {
     answered = false;
     questionText.textContent = question.question;
@@ -178,7 +191,7 @@
     });
   }
 
-  // Проверяем ответ
+  // Проверка ответа
   function checkAnswer(selected, btn, correct) {
     if (answered) return;
     answered = true;
@@ -189,18 +202,16 @@
       scoreEl.textContent = `💰 ${score}`;
     } else {
       btn.classList.add('incorrect');
-      // Показываем правильный
       const children = optionsContainer.children;
       if (children[correct]) children[correct].classList.add('correct');
     }
 
-    // Закрыть модал через 2 секунды
     setTimeout(() => {
       modal.classList.remove('active');
     }, 2000);
   }
 
-  // Создавать падающие элементы периодически
+  // Периодически создаем падающие элементы
   setInterval(createElement, 3000);
   createElement();
 </script>
