@@ -108,6 +108,7 @@
       z-index: 1000;
       user-select: none;
       -webkit-user-select: none;
+      transition: all 1.5s ease;
     }
   </style>
 </head>
@@ -123,7 +124,7 @@
   </div>
 
 <script>
-  // Функция для проигрывания звуков
+  // Звуки
   function playSound(type) {
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     const audioCtx = new AudioContext();
@@ -148,7 +149,7 @@
     }
   }
 
-  // Парсим параметры questions и element из URL
+  // Парсим из URL
   const urlParams = new URLSearchParams(window.location.search);
   let questions = [];
   let elementUrl = '';
@@ -160,6 +161,9 @@
   }
   elementUrl = urlParams.get('element') || '';
 
+  // Клонируем массив вопросов для управления повторениями
+  let questionsToAsk = questions.slice();
+
   const gameContainer = document.getElementById('gameContainer');
   const modal = document.getElementById('modal');
   const questionText = document.getElementById('questionText');
@@ -169,10 +173,18 @@
   let score = 0;
   let currentQuestion = null;
   let answered = false;
+  let gameEnded = false;
 
-  // Создаем падающий элемент
+  // ID интервала падающих элементов для остановки
+  let fallIntervalId;
+
+  // Создаём падающий элемент
   function createElement() {
-    if (!elementUrl || questions.length === 0) return;
+    if (gameEnded) return;
+    if (!elementUrl || questionsToAsk.length === 0) {
+      if (!gameEnded) endGame();
+      return;
+    }
 
     const el = document.createElement('div');
     el.className = 'element';
@@ -187,15 +199,14 @@
     el.addEventListener('click', e => {
       e.stopPropagation();
       if (modal.classList.contains('active')) return;
-      playSound('click');  // звук при клике на гифку
-      currentQuestion = questions[Math.floor(Math.random() * questions.length)];
+      playSound('click');
+      currentQuestion = questionsToAsk[Math.floor(Math.random() * questionsToAsk.length)];
       showModal(currentQuestion);
       el.remove();
     });
 
     gameContainer.appendChild(el);
 
-    // Удалить элемент после анимации, если не кликнули
     setTimeout(() => {
       if (el.parentNode) el.remove();
     }, duration);
@@ -226,7 +237,10 @@
       btn.classList.add('correct');
       score++;
       scoreEl.textContent = `💰 ${score}`;
-      playSound('correct'); // звук при правильном ответе
+      playSound('correct');
+      // Удаляем вопрос
+      const indexToRemove = questionsToAsk.indexOf(currentQuestion);
+      if (indexToRemove !== -1) questionsToAsk.splice(indexToRemove, 1);
     } else {
       btn.classList.add('incorrect');
       const children = optionsContainer.children;
@@ -235,11 +249,43 @@
 
     setTimeout(() => {
       modal.classList.remove('active');
+      if (questionsToAsk.length === 0) {
+        endGame();
+      }
     }, 2000);
   }
 
-  // Периодически создаем падающие элементы
-  setInterval(createElement, 3000);
+  // Конец игры
+  function endGame() {
+    gameEnded = true;
+    clearInterval(fallIntervalId);
+    // Плавно переместим счёт в центр
+    scoreEl.style.position = 'fixed';
+    scoreEl.style.top = null;
+    scoreEl.style.right = null;
+    scoreEl.style.left = '50%';
+    scoreEl.style.top = '50%';
+    scoreEl.style.transform = 'translate(-50%, -50%) scale(2)';
+    scoreEl.style.transition = 'all 1.5s ease';
+
+    gameContainer.innerHTML = `<div style="
+      position: fixed;
+      top: 65%;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #fff;
+      font-size: 24px;
+      font-weight: bold;
+      text-shadow: 0 0 5px #000;
+      user-select: none;
+      -webkit-user-select: none;
+    ">
+      Игра окончена! Твой результат: ${score} 💰
+    </div>`;
+  }
+
+  // Стартуем интервал падающих элементов
+  fallIntervalId = setInterval(createElement, 3000);
   createElement();
 </script>
 </body>
