@@ -123,6 +123,31 @@
   </div>
 
 <script>
+  // Функция для проигрывания звуков
+  function playSound(type) {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    const audioCtx = new AudioContext();
+    const osc = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+    osc.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+
+    if (type === 'click') {
+      osc.frequency.value = 800;
+      gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+      osc.start(audioCtx.currentTime);
+      osc.stop(audioCtx.currentTime + 0.1);
+    } else if (type === 'correct') {
+      osc.frequency.setValueAtTime(523, audioCtx.currentTime);
+      osc.frequency.setValueAtTime(659, audioCtx.currentTime + 0.1);
+      gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+      osc.start(audioCtx.currentTime);
+      osc.stop(audioCtx.currentTime + 0.3);
+    }
+  }
+
   // Парсим параметры questions и element из URL
   const urlParams = new URLSearchParams(window.location.search);
   let questions = [];
@@ -162,6 +187,7 @@
     el.addEventListener('click', e => {
       e.stopPropagation();
       if (modal.classList.contains('active')) return;
+      playSound('click');  // звук при клике на гифку
       currentQuestion = questions[Math.floor(Math.random() * questions.length)];
       showModal(currentQuestion);
       el.remove();
@@ -200,6 +226,7 @@
       btn.classList.add('correct');
       score++;
       scoreEl.textContent = `💰 ${score}`;
+      playSound('correct'); // звук при правильном ответе
     } else {
       btn.classList.add('incorrect');
       const children = optionsContainer.children;
