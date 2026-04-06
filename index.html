@@ -1,333 +1,485 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Game Editor</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Редактор игры</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-        body {
-            font-family: Arial, sans-serif;
-            background: #f5f5f5;
-            padding: 20px;
-        }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+    }
 
-        .panel {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px;
+      text-align: center;
+    }
 
-        h1 {
-            margin-bottom: 20px;
-            color: #333;
-        }
+    .header h1 {
+      font-size: 32px;
+      margin-bottom: 10px;
+    }
 
-        h2 {
-            font-size: 18px;
-            margin-top: 20px;
-            margin-bottom: 10px;
-            color: #555;
-            border-bottom: 2px solid #4CAF50;
-            padding-bottom: 5px;
-        }
+    .content {
+      padding: 30px;
+    }
 
-        .form-group {
-            margin-bottom: 15px;
-        }
+    .form-group {
+      margin-bottom: 20px;
+    }
 
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #333;
-        }
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #333;
+    }
 
-        input[type="text"],
-        input[type="url"],
-        textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-family: Arial, sans-serif;
-            font-size: 14px;
-        }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+      transition: border-color 0.3s;
+    }
 
-        textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: #667eea;
+    }
 
-        button {
-            background: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: background 0.3s;
-        }
+    .form-group textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
 
-        button:hover {
-            background: #45a049;
-        }
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
 
-        button.secondary {
-            background: #2196F3;
-        }
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      width: 100%;
+    }
 
-        button.secondary:hover {
-            background: #0b7dda;
-        }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+    }
 
-        button.danger {
-            background: #f44336;
-        }
+    .btn-secondary {
+      background: #f0f0f0;
+      color: #333;
+      margin-right: 10px;
+    }
 
-        button.danger:hover {
-            background: #da190b;
-        }
+    .btn-secondary:hover {
+      background: #e0e0e0;
+    }
 
-        .question-item {
-            background: #f9f9f9;
-            padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 10px;
-            border-left: 4px solid #4CAF50;
-        }
+    .btn-danger {
+      background: #ff6b6b;
+      color: white;
+    }
 
-        .question-item h3 {
-            font-size: 14px;
-            margin-bottom: 8px;
-            color: #333;
-        }
+    .btn-danger:hover {
+      background: #ff5252;
+    }
 
-        .question-item p {
-            font-size: 13px;
-            color: #666;
-            margin-bottom: 5px;
-        }
+    .btn-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
 
-        .question-item .options {
-            font-size: 12px;
-            color: #888;
-            margin-bottom: 10px;
-        }
+    .btn-group button {
+      flex: 1;
+    }
 
-        .btn-group {
-            display: flex;
-            gap: 5px;
-        }
+    .section {
+      margin-bottom: 40px;
+      padding-bottom: 30px;
+      border-bottom: 2px solid #f0f0f0;
+    }
 
-        .btn-group button {
-            flex: 1;
-            padding: 8px;
-            font-size: 12px;
-        }
+    .section:last-child {
+      border-bottom: none;
+    }
 
-        #preview {
-            background: #f0f0f0;
-            padding: 15px;
-            border-radius: 5px;
-            max-height: 300px;
-            overflow-y: auto;
-            font-size: 12px;
-            font-family: monospace;
-            word-break: break-all;
-        }
+    .section h2 {
+      font-size: 20px;
+      margin-bottom: 20px;
+      color: #333;
+    }
 
-        .img-preview {
-            width: 100px;
-            height: 100px;
-            border-radius: 5px;
-            margin-top: 10px;
-            object-fit: cover;
-        }
+    .question-item {
+      background: #f9f9f9;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      border-left: 4px solid #667eea;
+    }
 
-        @media (max-width: 768px) {
-            .container {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+    .question-item h3 {
+      font-size: 16px;
+      margin-bottom: 10px;
+      color: #333;
+    }
+
+    .question-item .options {
+      margin: 10px 0;
+      padding-left: 20px;
+    }
+
+    .question-item .options p {
+      font-size: 14px;
+      color: #666;
+      margin: 5px 0;
+    }
+
+    .question-item .type-badge {
+      display: inline-block;
+      background: #667eea;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      margin-bottom: 10px;
+    }
+
+    .question-item .type-badge.simple {
+      background: #4caf50;
+    }
+
+    .copy-btn {
+      background: #2196F3;
+      color: white;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+
+    .copy-btn:hover {
+      background: #1976D2;
+    }
+
+    .type-selector {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .type-selector label {
+      display: flex;
+      align-items: center;
+      margin-bottom: 0;
+      cursor: pointer;
+    }
+
+    .type-selector input[type="radio"] {
+      width: auto;
+      margin-right: 8px;
+      cursor: pointer;
+    }
+
+    #optionsWrapper {
+      background: #f9f9f9;
+      padding: 20px;
+      border-radius: 8px;
+      margin-top: 20px;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div class="panel">
-            <h1>🎮 Game Editor</h1>
-
-            <h2>Настройки игры</h2>
-            <div class="form-group">
-                <label>URL падающего элемента (гифка/изображение)</label>
-                <input type="url" id="elementUrl" placeholder="https://example.com/coin.gif" />
-                <img id="elementPreview" class="img-preview" style="display:none;" />
-            </div>
-
-            <h2>Добавить вопрос</h2>
-            <div class="form-group">
-                <label>Вопрос</label>
-                <textarea id="questionText" placeholder="Введите вопрос"></textarea>
-            </div>
-
-            <div class="form-group">
-                <label>Вариант ответа 1</label>
-                <input type="text" id="option1" placeholder="Ответ 1" />
-            </div>
-
-            <div class="form-group">
-                <label>Вариант ответа 2</label>
-                <input type="text" id="option2" placeholder="Ответ 2" />
-            </div>
-
-            <div class="form-group">
-                <label>Вариант ответа 3</label>
-                <input type="text" id="option3" placeholder="Ответ 3" />
-            </div>
-
-            <div class="form-group">
-                <label>Вариант ответа 4</label>
-                <input type="text" id="option4" placeholder="Ответ 4" />
-            </div>
-
-            <div class="form-group">
-                <label>Номер правильного ответа (1-4)</label>
-                <input type="text" id="correctAnswer" placeholder="1" style="width: 50px;" />
-            </div>
-
-            <button onclick="addQuestion()">+ Добавить вопрос</button>
-        </div>
-
-        <div class="panel">
-            <h2>Вопросы в игре</h2>
-            <div id="questionsList"></div>
-
-            <h2>Код для встраивания</h2>
-            <button class="secondary" onclick="generateCode()">Сгенерировать код</button>
-            <div id="preview"></div>
-            <button class="secondary" onclick="copyCode()" style="margin-top: 10px; width: 100%">
-                📋 Копировать код
-            </button>
-        </div>
+  <div class="container">
+    <div class="header">
+      <h1>🎮 Редактор игры с монетками</h1>
+      <p>Создавай задания и генерируй ссылки для игры</p>
     </div>
 
-    <script>
-        let questions = [];
+    <div class="content">
+      <!-- Секция добавления вопроса -->
+      <div class="section">
+        <h2>Добавить новое задание</h2>
 
-        function addQuestion() {
-            const text = document.getElementById("questionText").value.trim();
-            const opts = [
-                document.getElementById("option1").value.trim(),
-                document.getElementById("option2").value.trim(),
-                document.getElementById("option3").value.trim(),
-                document.getElementById("option4").value.trim(),
-            ];
-            const correct = parseInt(document.getElementById("correctAnswer").value) - 1;
+        <div class="form-group">
+          <label>Тип задания</label>
+          <div class="type-selector">
+            <label>
+              <input type="radio" name="questionType" value="quiz" checked />
+              Варианты ответа
+            </label>
+            <label>
+              <input type="radio" name="questionType" value="simple" />
+              Просто вопрос
+            </label>
+          </div>
+        </div>
 
-            if (!text || opts.some((o) => !o) || correct < 0 || correct > 3) {
-                alert("Заполните все поля и выберите правильный ответ (1-4)");
-                return;
-            }
+        <div class="form-group">
+          <label>Вопрос</label>
+          <textarea id="questionText" placeholder="Введите вопрос..."></textarea>
+        </div>
 
-            questions.push({ question: text, options: opts, correct });
+        <div id="optionsWrapper">
+          <div class="form-group">
+            <label>Вариант ответа 1</label>
+            <input type="text" id="option1" placeholder="Ответ 1" />
+          </div>
+          <div class="form-group">
+            <label>Вариант ответа 2</label>
+            <input type="text" id="option2" placeholder="Ответ 2" />
+          </div>
+          <div class="form-group">
+            <label>Вариант ответа 3</label>
+            <input type="text" id="option3" placeholder="Ответ 3" />
+          </div>
+          <div class="form-group">
+            <label>Вариант ответа 4</label>
+            <input type="text" id="option4" placeholder="Ответ 4" />
+          </div>
 
-            document.getElementById("questionText").value = "";
-            document.getElementById("option1").value = "";
-            document.getElementById("option2").value = "";
-            document.getElementById("option3").value = "";
-            document.getElementById("option4").value = "";
-            document.getElementById("correctAnswer").value = "";
+          <div class="form-group">
+            <label>Номер правильного ответа (1-4)</label>
+            <input type="text" id="correctAnswer" placeholder="1" style="width: 100px;" />
+          </div>
+        </div>
 
-            renderQuestions();
+        <button class="btn btn-primary" onclick="addQuestion()">Добавить задание</button>
+      </div>
+
+      <!-- Секция параметров игры -->
+      <div class="section">
+        <h2>Параметры игры</h2>
+
+        <div class="form-group">
+          <label>URL падающего элемента (гифка/изображение)</label>
+          <input type="text" id="elementUrl" placeholder="https://example.com/coin.gif" />
+        </div>
+
+        <div class="form-group">
+          <label>Предпросмотр элемента</label>
+          <div id="elementPreview" style="width: 100px; height: 100px; background: #f0f0f0; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #999;">
+            Нет изображения
+          </div>
+        </div>
+
+        <button class="btn btn-secondary" onclick="updatePreview()" style="width: auto;">Обновить предпросмотр</button>
+      </div>
+
+      <!-- Секция списка вопросов -->
+      <div class="section">
+        <h2>Добавленные задания (<span id="questionsCount">0</span>)</h2>
+        <div id="questionsList"></div>
+      </div>
+
+      <!-- Секция генерации ссылки -->
+      <div class="section">
+        <h2>Сгенерировать ссылку на игру</h2>
+        <button class="btn btn-primary" onclick="generateLink()">Сгенерировать iframe</button>
+        <div id="linkOutput" style="margin-top: 20px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let questions = [];
+
+    // Управление видимостью вариантов ответа
+    document.querySelectorAll('input[name="questionType"]').forEach(radio => {
+      radio.addEventListener('change', function() {
+        const optionsWrapper = document.getElementById('optionsWrapper');
+        if (this.value === 'simple') {
+          optionsWrapper.classList.add('hidden');
+        } else {
+          optionsWrapper.classList.remove('hidden');
+        }
+      });
+    });
+
+    function addQuestion() {
+      const typeRadios = document.querySelectorAll('input[name="questionType"]');
+      let type = 'quiz';
+      typeRadios.forEach(radio => {
+        if (radio.checked) type = radio.value;
+      });
+
+      const text = document.getElementById('questionText').value.trim();
+
+      if (!text) {
+        alert('Введите вопрос');
+        return;
+      }
+
+      if (type === 'quiz') {
+        const opts = [
+          document.getElementById('option1').value.trim(),
+          document.getElementById('option2').value.trim(),
+          document.getElementById('option3').value.trim(),
+          document.getElementById('option4').value.trim(),
+        ];
+        const correct = parseInt(document.getElementById('correctAnswer').value) - 1;
+
+        if (opts.some(o => !o) || correct < 0 || correct > 3) {
+          alert('Заполните все варианты и выберите правильный ответ (1-4)');
+          return;
         }
 
-        function renderQuestions() {
-            const list = document.getElementById("questionsList");
-            list.innerHTML = questions
-                .map(
-                    (q, i) => `
-                <div class="question-item">
-                    <h3>Вопрос ${i + 1}: ${q.question}</h3>
-                    <div class="options">
-                        ${q.options
-                            .map(
-                                (o, j) =>
-                                    `<p>${j + 1}. ${o} ${
-                                        j === q.correct ? "✓" : ""
-                                    }</p>`
-                            )
-                            .join("")}
-                    </div>
-                    <div class="btn-group">
-                        <button class="danger" onclick="deleteQuestion(${i})">Удалить</button>
-                    </div>
-                </div>`
-                )
-                .join("");
+        questions.push({ type, question: text, options: opts, correct });
+      } else {
+        questions.push({ type, question: text });
+      }
+
+      // Очистка формы
+      document.getElementById('questionText').value = '';
+      document.getElementById('option1').value = '';
+      document.getElementById('option2').value = '';
+      document.getElementById('option3').value = '';
+      document.getElementById('option4').value = '';
+      document.getElementById('correctAnswer').value = '';
+
+      renderQuestions();
+    }
+
+    function deleteQuestion(index) {
+      questions.splice(index, 1);
+      renderQuestions();
+    }
+
+    function renderQuestions() {
+      const list = document.getElementById('questionsList');
+      const count = document.getElementById('questionsCount');
+      count.textContent = questions.length;
+
+      list.innerHTML = questions.map((q, i) => {
+        if (q.type === 'quiz') {
+          return `
+            <div class="question-item">
+              <span class="type-badge">Варианты ответа</span>
+              <h3>Вопрос ${i + 1}: ${q.question}</h3>
+              <div class="options">
+                ${q.options.map((o, j) => `<p>${j + 1}. ${o} ${j === q.correct ? '✓' : ''}</p>`).join('')}
+              </div>
+              <div class="btn-group">
+                <button class="btn btn-danger" onclick="deleteQuestion(${i})">Удалить</button>
+              </div>
+            </div>
+          `;
+        } else {
+          return `
+            <div class="question-item">
+              <span class="type-badge simple">Простой вопрос</span>
+              <h3>Вопрос ${i + 1}: ${q.question}</h3>
+              <div class="btn-group">
+                <button class="btn btn-danger" onclick="deleteQuestion(${i})">Удалить</button>
+              </div>
+            </div>
+          `;
         }
+      }).join('');
+    }
 
-        function deleteQuestion(index) {
-            questions.splice(index, 1);
-            renderQuestions();
-        }
+    function updatePreview() {
+      const url = document.getElementById('elementUrl').value.trim();
+      const preview = document.getElementById('elementPreview');
 
-        function generateCode() {
-            const elementUrl = document.getElementById("elementUrl").value.trim();
+      if (!url) {
+        preview.innerHTML = 'Нет изображения';
+        preview.style.background = '#f0f0f0';
+        return;
+      }
 
-            if (!elementUrl) {
-                alert("Укажите URL элемента");
-                return;
-            }
+      const img = new Image();
+      img.onload = () => {
+        preview.innerHTML = '';
+        preview.style.background = 'transparent';
+        preview.style.backgroundImage = `url('${url}')`;
+        preview.style.backgroundSize = 'contain';
+        preview.style.backgroundRepeat = 'no-repeat';
+        preview.style.backgroundPosition = 'center';
+      };
+      img.onerror = () => {
+        preview.innerHTML = 'Ошибка загрузки';
+        preview.style.background = '#ffebee';
+      };
+      img.src = url;
+    }
 
-            if (questions.length === 0) {
-                alert("Добавьте хотя бы один вопрос");
-                return;
-            }
+    function generateLink() {
+      if (questions.length === 0) {
+        alert('Добавьте хотя бы одно задание');
+        return;
+      }
 
-            const questionsJson = JSON.stringify(questions);
-            const code = `<iframe src="https://trualinka.github.io/coin-editor/game.html?questions=${encodeURIComponent(
-                questionsJson
-            )}&element=${encodeURIComponent(
-                elementUrl
-            )}" width="100%" height="600" frameborder="0" style="border: none; border-radius: 10px;"></iframe>`;
+      const elementUrl = document.getElementById('elementUrl').value.trim();
+      if (!elementUrl) {
+        alert('Укажите URL падающего элемента');
+        return;
+      }
 
-            document.getElementById("preview").textContent = code;
-        }
+      const questionsJson = encodeURIComponent(JSON.stringify(questions));
+      const gameUrl = `https://trualinka.github.io/coin-editor/game.html?questions=${questionsJson}&element=${encodeURIComponent(elementUrl)}`;
 
-        function copyCode() {
-            const code = document.getElementById("preview").textContent;
-            if (!code) {
-                alert("Сначала сгенерируйте код");
-                return;
-            }
-            navigator.clipboard.writeText(code);
-            alert("Код скопирован!");
-        }
+      const iframe = `<iframe src="${gameUrl}" width="100%" height="600" frameborder="0" style="border: none; border-radius: 10px;"></iframe>`;
 
-        document.getElementById("elementUrl").addEventListener("change", function () {
-            const preview = document.getElementById("elementPreview");
-            if (this.value) {
-                preview.src = this.value;
-                preview.style.display = "block";
-            } else {
-                preview.style.display = "none";
-            }
-        });
-    </script>
+      const output = document.getElementById('linkOutput');
+      output.innerHTML = `
+        <div style="background: #f9f9f9; padding: 20px; border-radius: 8px;">
+          <h3 style="margin-top: 0;">Ссылка на игру:</h3>
+          <input type="text" value="${gameUrl}" readonly style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 15px;" />
+          <button class="copy-btn" onclick="copyToClipboard('${gameUrl}')">Копировать ссылку</button>
+
+          <h3 style="margin-top: 20px;">iframe для вставки:</h3>
+          <textarea readonly style="width: 100%; height: 100px; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-family: monospace; font-size: 12px; margin-bottom: 15px;">${iframe}</textarea>
+          <button class="copy-btn" onclick="copyToClipboard(\`${iframe}\`)">Копировать iframe</button>
+        </div>
+      `;
+    }
+
+    function copyToClipboard(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        alert('Скопировано в буфер обмена!');
+      });
+    }
+  </script>
 </body>
 </html>
